@@ -4,12 +4,23 @@
  *
  * (c) Alexander Manhart <alexander@manhart-it.de>
  *
+ * For a list of contributors, please see the CONTRIBUTORS.md file
+ * @see https://github.com/manhart/pool/blob/master/CONTRIBUTORS.md
+ *
  * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * file that was distributed with this source code, or visit the following link:
+ * @see https://github.com/manhart/pool/blob/master/LICENSE
+ *
+ * For more information about this project:
+ * @see https://github.com/manhart/pool
  */
 
+namespace pool\guis\GUI_Url;
+
+use Exception;
 use pool\classes\Core\Input\Input;
 use pool\classes\Core\Url;
+use pool\classes\GUI\GUI_Module;
 
 /**
  * Class GUI_Url
@@ -35,7 +46,7 @@ class GUI_Url extends GUI_Module
      * @param int|null $superglobals Superglobals (siehe Klasse Input)
      * @throws Exception
      */
-    public function init(?int $superglobals = Input::EMPTY):void
+    public function init(?int $superglobals = Input::EMPTY): void
     {
         $this->Defaults->addVar('script');
         $this->Defaults->addVar('params');
@@ -53,17 +64,16 @@ class GUI_Url extends GUI_Module
         $withQuery = !$this->Input->getAsBool('empty');
 
         $script = $this->Input->getVar('script');
-        if($script != '') {
+        if ($script != '') {
             $Url = Url::fromString($script);
-        }
-        else {
+        } else {
             $Url = new Url($withQuery);
         }
 
         $params = $this->Input->getVar('params');
-        if($params) {
+        if ($params) {
             $pieces = explode(';', $params);
-            foreach($pieces as $piece) {
+            foreach ($pieces as $piece) {
                 $param = explode(':', $piece);
                 $key = $param[0];
                 $value = $param[1] ?? null;
@@ -72,18 +82,18 @@ class GUI_Url extends GUI_Module
         }
 
         $passThrough = $this->Input->getVar('passthrough');
-        if($passThrough) {
+        if ($passThrough) {
             $IGet = new Input(Input::GET);
             $passThrough = explode(';', $passThrough);
-            foreach($passThrough as $param) {
+            foreach ($passThrough as $param) {
                 $Url->setParam($param, $IGet->getVar($param));
             }
             unset($IGet);
         }
         $eliminate = $this->Input->getVar('eliminate');
-        if($eliminate) {
+        if ($eliminate) {
             $eliminate = explode(';', $eliminate);
-            foreach($eliminate as $param) {
+            foreach ($eliminate as $param) {
                 $Url->setParam($param, null);
             }
         }

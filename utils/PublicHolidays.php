@@ -1,13 +1,28 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of POOL (PHP Object-Oriented Library)
  *
  * (c) Alexander Manhart <alexander@manhart-it.de>
  *
+ * For a list of contributors, please see the CONTRIBUTORS.md file
+ * @see https://github.com/manhart/pool/blob/master/CONTRIBUTORS.md
+ *
  * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * file that was distributed with this source code, or visit the following link:
+ * @see https://github.com/manhart/pool/blob/master/LICENSE
+ *
+ * For more information about this project:
+ * @see https://github.com/manhart/pool
  */
 
+declare(strict_types = 1);
+
+namespace pool\utils;
+
+use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
+use Exception;
 use pool\classes\Core\PoolObject;
 
 final class PublicHolidays extends PoolObject
@@ -29,7 +44,7 @@ final class PublicHolidays extends PoolObject
     const OSTERMONTAG = 8;
     const TAGDERARBEIT = 9;
     const CHRISTIHIMMELFAHRT = 10;
-    const PFINGSTSONNTAG =11;
+    const PFINGSTSONNTAG = 11;
     const PFINGSTMONTAG = 12;
     const FRONLEICHNAM = 13;
     const AUGSBURGERFRIEDENSFEST = 14;
@@ -40,7 +55,6 @@ final class PublicHolidays extends PoolObject
     const BUSSUNDBETTAG = 19;
     const ERSTERWEIHNACHTSTAG = 20;
     const ZWEITERWEIHNACHTSTAG = 21;
-
     /**
      * Bundesländer
      *
@@ -84,7 +98,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::ALLERHEILIGEN,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_BAYERN => [
             self::NEUJAHRSTAG,
@@ -100,7 +114,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::ALLERHEILIGEN,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_BERLIN => [
             self::NEUJAHRSTAG,
@@ -114,7 +128,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::REFORMATIONSTAG,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_BRANDENBURG => [
             self::NEUJAHRSTAG,
@@ -127,7 +141,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::REFORMATIONSTAG,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_BREMEN => [
             self::NEUJAHRSTAG,
@@ -140,7 +154,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::REFORMATIONSTAG,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_HAMBURG => [
             self::NEUJAHRSTAG,
@@ -153,7 +167,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::REFORMATIONSTAG,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_HESSEN => [
             self::NEUJAHRSTAG,
@@ -166,7 +180,7 @@ final class PublicHolidays extends PoolObject
             self::FRONLEICHNAM,
             self::TAGDERDEUTSCHENEINHEIT,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_MECKLENBURGVORPOMMERN => [
             self::NEUJAHRSTAG,
@@ -179,7 +193,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::REFORMATIONSTAG,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_NIEDERSACHSEN => [
             self::NEUJAHRSTAG,
@@ -192,7 +206,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::REFORMATIONSTAG,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_NORDRHEINWESTFALEN => [
             self::NEUJAHRSTAG,
@@ -206,7 +220,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::ALLERHEILIGEN,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_RHEINLANDPFALZ => [
             self::NEUJAHRSTAG,
@@ -220,7 +234,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::ALLERHEILIGEN,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_SAARLAND => [
             self::NEUJAHRSTAG,
@@ -235,7 +249,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::ALLERHEILIGEN,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_SACHSEN => [
             self::NEUJAHRSTAG,
@@ -250,7 +264,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::ALLERHEILIGEN,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_SACHSENANHALT => [
             self::NEUJAHRSTAG,
@@ -264,7 +278,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::ALLERHEILIGEN,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_SCHLESWIGHOLSTEIN => [
             self::NEUJAHRSTAG,
@@ -277,7 +291,7 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::ALLERHEILIGEN,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
         self::STATE_THUERINGEN => [
             self::NEUJAHRSTAG,
@@ -291,12 +305,13 @@ final class PublicHolidays extends PoolObject
             self::TAGDERDEUTSCHENEINHEIT,
             self::ALLERHEILIGEN,
             self::ERSTERWEIHNACHTSTAG,
-            self::ZWEITERWEIHNACHTSTAG
+            self::ZWEITERWEIHNACHTSTAG,
         ],
     ];
 
     /**
      * holds the public holidays
+     *
      * @var array
      */
     private array $publicHolidays = [];
@@ -313,12 +328,202 @@ final class PublicHolidays extends PoolObject
         $year = (int)$Date->format('Y');
         $date = $Date->format(PHP_MARIADB_DATE_FORMAT);
         $PublicHolidays = new PublicHolidays();
-        foreach($PublicHolidays->getLegalHolidays($year, $state) as $Holiday) {
-            if($Holiday->format(PHP_MARIADB_DATE_FORMAT) == $date) {
+        foreach ($PublicHolidays->getLegalHolidays($year, $state) as $Holiday) {
+            if ($Holiday->format(PHP_MARIADB_DATE_FORMAT) == $date) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * returns legal german holidays
+     *
+     * @param int $year
+     * @param string $state
+     * @return array
+     * @throws \pool\classes\Exception\InvalidArgumentException
+     */
+    public function getLegalHolidays(int $year, string $state = ''): array
+    {
+        try {
+            $this->factory($year);
+        } catch (Exception) {
+        }
+
+        if ($state == '') {
+            return $this->publicHolidays[$year]['legal'];
+        }
+
+        if (!isset($this->publicHolidaysByState[$state])) {
+            throw new \pool\classes\Exception\InvalidArgumentException("state $state unknown");
+        }
+
+        $holidays = [];
+        foreach ($this->publicHolidaysByState[$state] as $key) {
+            $holidays[$key] = $this->publicHolidays[$year]['legal'][$key];
+        }
+        return $holidays;
+    }
+
+    /**
+     * creates internally all holidays of a year.
+     *
+     * @param int $year
+     * @return void
+     * @throws Exception
+     */
+    private function factory(int $year): void
+    {
+        if (isset($this->publicHolidays[$year])) {
+            // already created
+            return;
+        }
+        $Date = new DateTimeImmutable($year.'-01-01');
+        $this->publicHolidays[$year]['legal'][self::NEUJAHRSTAG] = $Date;
+
+        $Date = new DateTimeImmutable($year.'-01-06');
+        $this->publicHolidays[$year]['legal'][self::HEILIGEDREIKOENIGE] = $Date;
+
+        $EasterSunday = $this->calculateEasterSunday($year);
+
+        $Date = $EasterSunday->modify('-46 days');
+        $this->publicHolidays[$year]['other'][self::ASCHERMITTWOCH] = $Date;
+
+        $Date = $EasterSunday->modify('-48 days');
+        $this->publicHolidays[$year]['other'][self::ROSENMONTAG] = $Date;
+
+        $Date = new DateTimeImmutable($year.'-03-08');
+        $this->publicHolidays[$year]['legal'][self::FRAUENTAG] = $Date;
+
+
+        $Date = $EasterSunday->modify('-3 days');
+        $this->publicHolidays[$year]['other'][self::GRUENDONNERSTAG] = $Date;
+
+        $Date = $EasterSunday->modify('-2 days');
+        $this->publicHolidays[$year]['legal'][self::KARFREITAG] = $Date;
+
+        $Date = $EasterSunday;
+        $this->publicHolidays[$year]['legal'][self::OSTERSONNTAG] = $Date;
+
+        $Date = $EasterSunday->modify('+1 days');
+        $this->publicHolidays[$year]['legal'][self::OSTERMONTAG] = $Date;
+
+        $Date = new DateTimeImmutable($year.'-05-01');
+        $this->publicHolidays[$year]['legal'][self::TAGDERARBEIT] = $Date;
+
+        $Date = $EasterSunday->modify('+39 days');
+        $this->publicHolidays[$year]['legal'][self::CHRISTIHIMMELFAHRT] = $Date;
+
+        $Date = $EasterSunday->modify('+49 days');
+        $this->publicHolidays[$year]['legal'][self::PFINGSTSONNTAG] = $Date;
+
+        $Date = $EasterSunday->modify('+50 days');
+        $this->publicHolidays[$year]['legal'][self::PFINGSTMONTAG] = $Date;
+
+        $Date = $EasterSunday->modify('+60 days');
+        $this->publicHolidays[$year]['legal'][self::FRONLEICHNAM] = $Date;
+
+        $Date = new DateTimeImmutable($year.'-08-08');
+        $this->publicHolidays[$year]['legal'][self::AUGSBURGERFRIEDENSFEST] = $Date;
+
+        $Date = new DateTimeImmutable($year.'-08-15');
+        $this->publicHolidays[$year]['legal'][self::MARIAEHIMMELFAHRT] = $Date;
+
+        $Date = new DateTimeImmutable($year.'-10-03');
+        $this->publicHolidays[$year]['legal'][self::TAGDERDEUTSCHENEINHEIT] = $Date;
+
+        $Date = new DateTimeImmutable($year.'-10-31');
+        $this->publicHolidays[$year]['legal'][self::REFORMATIONSTAG] = $Date;
+
+        $Date = new DateTimeImmutable($year.'-11-01');
+        $this->publicHolidays[$year]['legal'][self::ALLERHEILIGEN] = $Date;
+
+        $Date = new DateTimeImmutable($year.'-11-22');
+        while ($Date->format('N') != 3) {
+            $Date = $Date->modify('-1 days');
+        }
+        $this->publicHolidays[$year]['legal'][self::BUSSUNDBETTAG] = $Date;
+
+        $Date = new DateTimeImmutable($year.'-12-25');
+        $this->publicHolidays[$year]['legal'][self::ERSTERWEIHNACHTSTAG] = $Date;
+
+        $Date = new DateTimeImmutable($year.'-12-26');
+        $this->publicHolidays[$year]['legal'][self::ZWEITERWEIHNACHTSTAG] = $Date;
+    }
+
+    /**
+     * calculate easter sunday
+     *
+     * @param int $year
+     * @return DateTimeImmutable
+     */
+    public function calculateEasterSunday(int $year): DateTimeImmutable
+    {
+        $os = self::gauss($year);
+
+        $monat = 3;
+
+        // $os may be the 32. March = 1. April
+        if (31 < $os) {
+            $os = $os % 31;
+            $monat = 4;
+        }
+
+        return new DateTimeImmutable("$year-$monat-$os");
+    }
+
+    /**
+     * @see https://de.wikipedia.org/wiki/Gau%C3%9Fsche_Osterformel
+     * @param int $year
+     * @return int
+     */
+    private static function gauss(int $year): int
+    {
+        $a = self::mod($year, 19);
+        $b = self::mod($year, 4);
+        $c = self::mod($year, 7);
+        $H1 = self::div($year, 100);
+        $H2 = self::div($year, 400);
+        $N = 4 + $H1 - $H2;
+        $M = 15 + $H1 - $H2 - self::div(8 * $H1 + 13, 25);
+        $d = self::mod(19 * $a + $M, 30);
+        $e = self::mod(2 * $b + 4 * $c + 6 * $d + $N, 7);
+        $o = 22 + $d + $e;
+
+        if ($o == 57) {
+            $o = 50;
+        }
+
+        if ($d == 28 && $e == 6 && $a > 10) {
+            $o = 49;
+        }
+
+        return $o;
+    }
+
+    /**
+     * modulus
+     *
+     * @param int $a
+     * @param int $b
+     * @return int
+     */
+    private static function mod(int $a, int $b): int
+    {
+        return $a % $b;
+    }
+
+    /**
+     * divide
+     *
+     * @param int $a
+     * @param int $b
+     * @return int
+     */
+    private static function div(int $a, int $b): int
+    {
+        return intval($a / $b);
     }
 
     /**
@@ -336,8 +541,8 @@ final class PublicHolidays extends PoolObject
         $date = $Date->format(PHP_MARIADB_DATE_FORMAT);
 
         $PublicHolidays = new PublicHolidays();
-        foreach($PublicHolidays->getLegalHolidays($year, $state) as $key => $Holiday) {
-            if($Holiday->format(PHP_MARIADB_DATE_FORMAT) == $date) {
+        foreach ($PublicHolidays->getLegalHolidays($year, $state) as $key => $Holiday) {
+            if ($Holiday->format(PHP_MARIADB_DATE_FORMAT) == $date) {
                 return new PublicHoliday($key, $Holiday);
             }
         }
@@ -352,7 +557,7 @@ final class PublicHolidays extends PoolObject
      */
     static function getHolidayName(int $key)
     {
-        switch($key) {
+        switch ($key) {
             case self::NEUJAHRSTAG:
                 return 'Neujahrstag';
 
@@ -418,212 +623,22 @@ final class PublicHolidays extends PoolObject
      */
     public function getLegalHolidaysByRange(DateTimeInterface $FromDate, DateTimeInterface $ToDate): array
     {
-        $holidaysByRange = array();
+        $holidaysByRange = [];
         $fromYear = (int)$FromDate->format('Y');
         $toYear = (int)$ToDate->format('Y');
 
-        for($i=$fromYear; $i <= $toYear; $i++) {
+        for ($i = $fromYear; $i <= $toYear; $i++) {
             try {
                 $this->factory($i);
+            } catch (Exception) {
             }
-            catch(Exception) {}
 
-            foreach($this->publicHolidays as $key => $Holiday) {
-                if($FromDate <= $Holiday and $Holiday <= $ToDate) {
+            foreach ($this->publicHolidays as $key => $Holiday) {
+                if ($FromDate <= $Holiday and $Holiday <= $ToDate) {
                     $holidaysByRange[$key] = $Holiday;
                 }
             }
         }
         return $holidaysByRange;
-    }
-
-    /**
-     * returns legal german holidays
-     *
-     * @param int $year
-     * @param string $state
-     * @return array
-     * @throws \pool\classes\Exception\InvalidArgumentException
-     */
-    public function getLegalHolidays(int $year, string $state = ''): array
-    {
-        try {
-            $this->factory($year);
-        }
-        catch(Exception) {}
-
-        if($state == '') {
-            return $this->publicHolidays[$year]['legal'];
-        }
-
-        if(!isset($this->publicHolidaysByState[$state])) {
-            throw new \pool\classes\Exception\InvalidArgumentException("state $state unknown");
-        }
-
-        $holidays = [];
-        foreach($this->publicHolidaysByState[$state] as $key) {
-            $holidays[$key] = $this->publicHolidays[$year]['legal'][$key];
-        }
-        return $holidays;
-    }
-
-    /**
-     * creates internally all holidays of a year.
-     *
-     * @param int $year
-     * @return void
-     * @throws Exception
-     */
-    private function factory(int $year): void
-    {
-        if(isset($this->publicHolidays[$year])) {
-            // already created
-            return;
-        }
-        $Date = new DateTimeImmutable($year.'-01-01');
-        $this->publicHolidays[$year]['legal'][self::NEUJAHRSTAG] = $Date;
-
-        $Date = new DateTimeImmutable($year.'-01-06');
-        $this->publicHolidays[$year]['legal'][self::HEILIGEDREIKOENIGE] = $Date;
-
-        $EasterSunday = $this->calculateEasterSunday($year);
-
-        $Date = $EasterSunday->modify('-46 days');
-        $this->publicHolidays[$year]['other'][self::ASCHERMITTWOCH] = $Date;
-
-        $Date = $EasterSunday->modify('-48 days');
-        $this->publicHolidays[$year]['other'][self::ROSENMONTAG] = $Date;
-
-        $Date = new DateTimeImmutable($year . '-03-08');
-        $this->publicHolidays[$year]['legal'][self::FRAUENTAG] = $Date;
-
-
-        $Date = $EasterSunday->modify('-3 days');
-        $this->publicHolidays[$year]['other'][self::GRUENDONNERSTAG] = $Date;
-
-        $Date = $EasterSunday->modify('-2 days');
-        $this->publicHolidays[$year]['legal'][self::KARFREITAG] = $Date;
-
-        $Date = $EasterSunday;
-        $this->publicHolidays[$year]['legal'][self::OSTERSONNTAG] = $Date;
-
-        $Date = $EasterSunday->modify('+1 days');
-        $this->publicHolidays[$year]['legal'][self::OSTERMONTAG] = $Date;
-
-        $Date = new DateTimeImmutable($year.'-05-01');
-        $this->publicHolidays[$year]['legal'][self::TAGDERARBEIT] = $Date;
-
-        $Date = $EasterSunday->modify('+39 days');
-        $this->publicHolidays[$year]['legal'][self::CHRISTIHIMMELFAHRT] = $Date;
-
-        $Date = $EasterSunday->modify('+49 days');
-        $this->publicHolidays[$year]['legal'][self::PFINGSTSONNTAG] = $Date;
-
-        $Date = $EasterSunday->modify('+50 days');
-        $this->publicHolidays[$year]['legal'][self::PFINGSTMONTAG] = $Date;
-
-        $Date = $EasterSunday->modify('+60 days');
-        $this->publicHolidays[$year]['legal'][self::FRONLEICHNAM] = $Date;
-
-        $Date = new DateTimeImmutable($year.'-08-08');
-        $this->publicHolidays[$year]['legal'][self::AUGSBURGERFRIEDENSFEST] = $Date;
-
-        $Date = new DateTimeImmutable($year.'-08-15');
-        $this->publicHolidays[$year]['legal'][self::MARIAEHIMMELFAHRT] = $Date;
-
-        $Date = new DateTimeImmutable($year.'-10-03');
-        $this->publicHolidays[$year]['legal'][self::TAGDERDEUTSCHENEINHEIT] = $Date;
-
-        $Date = new DateTimeImmutable($year.'-10-31');
-        $this->publicHolidays[$year]['legal'][self::REFORMATIONSTAG] = $Date;
-
-        $Date = new DateTimeImmutable($year.'-11-01');
-        $this->publicHolidays[$year]['legal'][self::ALLERHEILIGEN] = $Date;
-
-        $Date = new DateTimeImmutable($year.'-11-22');
-        while ($Date->format('N') != 3) {
-            $Date = $Date->modify('-1 days');
-        }
-        $this->publicHolidays[$year]['legal'][self::BUSSUNDBETTAG] = $Date;
-
-        $Date = new DateTimeImmutable($year.'-12-25');
-        $this->publicHolidays[$year]['legal'][self::ERSTERWEIHNACHTSTAG] = $Date;
-
-        $Date = new DateTimeImmutable($year.'-12-26');
-        $this->publicHolidays[$year]['legal'][self::ZWEITERWEIHNACHTSTAG] = $Date;
-    }
-
-    /**
-     * divide
-     *
-     * @param int $a
-     * @param int $b
-     * @return int
-     */
-    private static function div(int $a, int $b): int
-    {
-        return intval($a / $b);
-    }
-
-    /**
-     * modulus
-     *
-     * @param int $a
-     * @param int $b
-     * @return int
-     */
-    private static function mod(int $a, int $b): int
-    {
-        return $a % $b;
-    }
-
-    /**
-     * @see https://de.wikipedia.org/wiki/Gau%C3%9Fsche_Osterformel
-     *
-     * @param int $year
-     * @return int
-     */
-    private static function gauss(int $year): int
-    {
-        $a = self::mod($year, 19);
-        $b = self::mod($year, 4);
-        $c = self::mod($year, 7);
-        $H1 = self::div($year, 100);
-        $H2 = self::div($year, 400);
-        $N = 4 + $H1 - $H2;
-        $M = 15 + $H1 - $H2 - self::div(8 * $H1 + 13, 25);
-        $d = self::mod(19 * $a + $M, 30);
-        $e = self::mod(2 * $b + 4 * $c + 6 * $d + $N, 7);
-        $o = 22 + $d + $e;
-
-        if ($o == 57) {
-            $o = 50;
-        }
-
-        if ($d == 28 && $e == 6 && $a > 10) {
-            $o = 49;
-        }
-
-        return $o;
-    }
-
-    /**
-     * calculate easter sunday
-     * @param int $year
-     * @return DateTimeImmutable
-     */
-    public function calculateEasterSunday(int $year): DateTimeImmutable
-    {
-        $os = self::gauss($year);
-
-        $monat = 3;
-
-        // $os may be the 32. March = 1. April
-        if (31 < $os) {
-            $os = $os % 31;
-            $monat = 4;
-        }
-
-        return new DateTimeImmutable("$year-$monat-$os");
     }
 }

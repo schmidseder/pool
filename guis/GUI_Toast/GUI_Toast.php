@@ -8,44 +8,36 @@
  * file that was distributed with this source code.
  */
 
+namespace pool\guis\GUI_Toast;
+
 use pool\classes\Core\Input\Input;
+use pool\classes\GUI\GUI_Module;
 
 /**
  * Class GUI_Toast
+ *
  * @package pool\guis\GUI_Toast
  * @since 2020-11-18, 19:12
  */
 class GUI_Toast extends GUI_Module
 {
-    /**
-     * @param int|null $superglobals
-     * @throws Exception
-     */
-    public function init(?int $superglobals = Input::EMPTY): void
-    {
-        $this->Defaults->addVar('framework', 'bs4');
-        parent::init($superglobals);
-    }
+    protected int $superglobals = Input::EMPTY;
 
-    /**
-     * load files
-     */
-    public function loadFiles()
+    public function loadFiles(): static
     {
         parent::loadFiles();
-        $fw = $this->getVar('framework');
-        $tpl = $this->Weblication->findTemplate('tpl_toast_'.$fw.'.html', __CLASS__, true);
+        $fw = $this->getVar('framework') ?? 'bs4';
+        $tpl = $this->Weblication->findTemplate('tpl_toast_'.$fw.'.html', 'GUI_Toast', true);
         $this->Template->setFilePath('stdout', $tpl);
 
-        if($this->Weblication->hasFrame()) {
-            $this->Weblication->getFrame()->getHeadData()->addJavaScript($this->Weblication->findJavaScript('Toast.js', __CLASS__, true));
-            $this->Weblication->getFrame()->getHeadData()->addStyleSheet($this->Weblication->findStyleSheet('toast_'.$fw.'.css', __CLASS__, true));
-        }
+        $this->Weblication?->getFrame()?->getHeadData()
+            ?->addClientWebAsset('js', 'Toast', __CLASS__, true)
+            ?->addClientWebAsset('css', "toast_$fw", __CLASS__, true)
+        ;
+
+        return $this;
     }
 
-    /**
-     * prepare content
-     */
     protected function prepare(): void
     {
         $this->Template->setVar('moduleName', $this->getName());

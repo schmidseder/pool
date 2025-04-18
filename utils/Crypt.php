@@ -19,11 +19,12 @@ namespace pool\utils;
 
 use JetBrains\PhpStorm\Pure;
 use Random\RandomException;
+use SensitiveParameter;
 use SodiumException;
 
 final class Crypt
 {
-    /** * @throws SodiumException */
+    /** @throws SodiumException */
     #[Pure]
     public static function decrypt(string $pass, string $key): string
     {
@@ -33,21 +34,23 @@ final class Crypt
         return sodium_crypto_secretbox_open(
             $pass,
             $nonce,
-            $key
+            $key,
         );
     }
 
-    /** @throws SodiumException
-     * @throws RandomException */
+    /**
+     * @throws SodiumException
+     * @throws RandomException
+     */
     #[Pure]
-    public static function encrypt(#[\SensitiveParameter] string $secret_pass, string $key): string
+    public static function encrypt(#[SensitiveParameter] string $secret_pass, string $key): string
     {
         $nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
-        return $nonce .
+        return $nonce.
             sodium_crypto_secretbox(
                 $secret_pass,
                 $nonce,
-                $key
+                $key,
             );
     }
 }

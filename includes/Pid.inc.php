@@ -1,43 +1,46 @@
 <?php
-/**
- * -= PHP Object Oriented Library (POOL) =-
+/*
+ * This file is part of POOL (PHP Object-Oriented Library)
  *
- * $HeadURL$
+ * (c) Alexander Manhart <alexander@manhart-it.de>
  *
- * Erweiterung zur Utils.inc.php: Prozess ID Management
+ * For a list of contributors, please see the CONTRIBUTORS.md file
+ * @see https://github.com/manhart/pool/blob/master/CONTRIBUTORS.md
  *
- * @version $Id$
- * @version $Revision$
- * @version $Author$
- * @version $Date$
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code, or visit the following link:
+ * @see https://github.com/manhart/pool/blob/master/LICENSE
  *
- * @since 2007-09-19
- * @author Alexander Manhart <alexander@manhart.bayern>
- * @link https://alexander-manhart.de
- **/
+ * For more information about this project:
+ * @see https://github.com/manhart/pool
+ */
 
-function open_pid_file($file) {
-    if(file_exists($file)) {
+/**
+ * @since 2007-09-19
+ */
+function open_pid_file($file)
+{
+    $nl = pool\LINE_BREAK;
+    if (file_exists($file)) {
         $fp = fopen($file, 'r');
         $pid = fgets($fp, 1024);
         fclose($fp);
-        if(posix_kill($pid, 0)) {
-            print 'Cronjob '.$_SERVER['PHP_SELF'].' already running with PID: '.$pid.chr(10);
+        if (posix_kill($pid, 0)) {
+            print "Script {$_SERVER['PHP_SELF']} already running with PID: $pid$nl";
             exit;
         }
-        print 'Removing PID file for defunct server process '.$pid.chr(10);
-        if(!unlink($file)) {
-            print 'Cannot unlink PID file '.$file.chr(10);
+        print "Removing PID file for defunct server process $pid$nl";
+        if (!unlink($file)) {
+            print "Cannot unlink PID file $file$nl";
             exit;
         }
     }
-    if($fp = fopen($file, 'w')) {
+    if ($fp = fopen($file, 'w')) {
         fputs($fp, posix_getpid());
         fclose($fp);
         return $fp;
-    }
-    else {
-        print 'Unable to open PID file '.$file.' for writing...'.chr(10);
+    } else {
+        print "Unable to open PID file $file for writing...$nl";
         exit;
     }
 }

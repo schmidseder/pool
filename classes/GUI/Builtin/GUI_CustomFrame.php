@@ -4,12 +4,24 @@
  *
  * (c) Alexander Manhart <alexander@manhart-it.de>
  *
+ * For a list of contributors, please see the CONTRIBUTORS.md file
+ * @see https://github.com/manhart/pool/blob/master/CONTRIBUTORS.md
+ *
  * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * file that was distributed with this source code, or visit the following link:
+ * @see https://github.com/manhart/pool/blob/master/LICENSE
+ *
+ * For more information about this project:
+ * @see https://github.com/manhart/pool
  */
+
+namespace pool\classes\GUI\Builtin;
 
 use pool\classes\Core\Component;
 use pool\classes\Exception\ModulNotFoundException;
+use pool\classes\GUI\GUI_Module;
+use pool\classes\translator\TranslationProvider_ToolDecorator;
+use pool\guis\GUI_HeadData\GUI_HeadData;
 
 /**
  * GUI_CustomFrame ist eine abstrakte Klasse. Der Haupteinsatzzweck dieser Klasse besteht darin,
@@ -85,12 +97,12 @@ class GUI_CustomFrame extends GUI_Module
     }
 
     /**
-     * load default Weblication.class.js and GUI_Module.class.js
+     * load default Weblication.class.js and GUI_Module.js
      */
-    public function loadFiles()
+    public function loadFiles(): static
     {
         parent::loadFiles();
-        if(@\pool\classes\translator\TranslationProvider_ToolDecorator::isActive()) {
+        if (@TranslationProvider_ToolDecorator::isActive()) {
             $this->HeadData->addStyleSheet($this->Weblication->findStyleSheet('translatorToolInline.css', '', false));
             $this->HeadData->addJavaScript($this->Weblication->findJavaScript('translatorToolInline.js', '', true));
         }
@@ -98,6 +110,7 @@ class GUI_CustomFrame extends GUI_Module
         $this->HeadData->addJavaScript($this->Weblication->findJavaScript('Error.js', '', true));
         $this->HeadData->addJavaScript($this->Weblication->findJavaScript('Weblication.js', '', true));
         $this->HeadData->addJavaScript($this->Weblication->findJavaScript('GUI_Module.js', '', true));
+        return $this;
     }
 
     /**
@@ -120,11 +133,11 @@ class GUI_CustomFrame extends GUI_Module
      */
     public function addBodyEvent(string $event, string $function): static
     {
-        if(!isset($this->events[$event])) {
+        if (!isset($this->events[$event])) {
             $this->events[$event] = [];
         }
 
-        if(!in_array($function, $this->events[$event])) {
+        if (!in_array($function, $this->events[$event])) {
             $this->events[$event][] = $function;
         }
         return $this;
@@ -139,7 +152,7 @@ class GUI_CustomFrame extends GUI_Module
      */
     public function addScriptFileAtTheEnd(string $jsFile, $position = null): static
     {
-        if($this->addFileFct) {
+        if ($this->addFileFct) {
             $jsFile = call_user_func($this->addFileFct, $jsFile);
         }
         array_unshift($this->scriptFilesAtTheEnd, $jsFile);
@@ -205,8 +218,8 @@ class GUI_CustomFrame extends GUI_Module
         $scriptAtTheEnd = count($this->scriptAtTheEnd) ? implode(';', $this->scriptAtTheEnd) : '';
 
         $scriptFilesAtTheEnd = '';
-        if(count($this->scriptFilesAtTheEnd)) {
-            foreach($this->scriptFilesAtTheEnd as $scriptFile) {
+        if (count($this->scriptFilesAtTheEnd)) {
+            foreach ($this->scriptFilesAtTheEnd as $scriptFile) {
                 $scriptFilesAtTheEnd .= '<script src="'.$scriptFile.'"></script>'.chr(10);
             }
         }
@@ -215,11 +228,11 @@ class GUI_CustomFrame extends GUI_Module
 
 
         // no templates assigned
-        if(!$this->Template->countFileList()) {
+        if (!$this->Template->countFileList()) {
             return '';
         }
 
-        if($scriptWhenReady || $scriptAtTheEnd) {
+        if ($scriptWhenReady || $scriptAtTheEnd) {
             $InlineScriptBlock = $this->Template->newBlock('INLINE-SCRIPT');
             $InlineScriptBlock?->setVars([
                 'ScriptWhenReady' => $scriptWhenReady,
@@ -229,7 +242,7 @@ class GUI_CustomFrame extends GUI_Module
         }
         $this->Template->setVar('ScriptFilesAtTheEnd', $scriptFilesAtTheEnd);
 
-        $vars = array_map(function($functions) {
+        $vars = array_map(function ($functions) {
             // concatenating javascript functions
             return implode(';', $functions);
         }, $this->events);

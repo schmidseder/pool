@@ -18,6 +18,7 @@ use pool\classes\Exception\InvalidArgumentException;
 
 /**
  * Class Log
+ *
  * @package pool\classes\Utils
  * @since 2022-01-18
  */
@@ -44,7 +45,7 @@ class Log
         2 => 'error',
         4 => 'warn',
         8 => 'info',
-        16 => 'debug'
+        16 => 'debug',
     ];
 
     private static bool $dao_strip_tags = true;
@@ -74,17 +75,16 @@ class Log
      * -showLevelNameAtTheBeginning - prints the caption of the level (debug, info, warn, error, fatal) at the beginning of the message
      *
      * @param string $configurationName name of the configuration. Default is "common". You can have more configurations for different purposes.
-     * @param array $facilities
+     * @param array $facilities array of facilities
      */
     public static function setup(array $facilities, string $configurationName = Log::COMMON): void
     {
         $level = self::$facilities[$configurationName][self::OUTPUT_SCREEN]['level'] ?? 0;
-        if(isset($facilities[self::OUTPUT_SCREEN])) {
+        if (isset($facilities[self::OUTPUT_SCREEN])) {
             $facility = $facilities[self::OUTPUT_SCREEN];
-            if(is_array($facility)) {
+            if (is_array($facility)) {
                 $level = $facility['level'] ?? 0;
-            }
-            else {
+            } else {
                 $level = $facility;
                 $facilities[self::OUTPUT_SCREEN] = [];
             }
@@ -92,21 +92,20 @@ class Log
         $facilities[self::OUTPUT_SCREEN]['level'] = (int)$level;
 
         $level = 0;
-        if(isset($facilities[self::OUTPUT_SYSTEM])) {
+        if (isset($facilities[self::OUTPUT_SYSTEM])) {
             $facility = $facilities[self::OUTPUT_SYSTEM];
-            if(is_array($facility)) {
+            if (is_array($facility)) {
                 $level = $facility['level'] ?? 0;
-            }
-            else {
+            } else {
                 $level = $facility;
             }
         }
         $facilities[self::OUTPUT_SYSTEM]['level'] = (int)$level;
 
         $level = self::$facilities[$configurationName][self::OUTPUT_FILE]['level'] ?? 0;
-        if(isset($facilities[self::OUTPUT_FILE])) {
+        if (isset($facilities[self::OUTPUT_FILE])) {
             $facility = $facilities[self::OUTPUT_FILE];
-            if(is_array($facility)) {
+            if (is_array($facility)) {
                 $level = $facility['level'] ?? 0;
                 $file = $facility['file'] ?? '';
 
@@ -114,8 +113,7 @@ class Log
                 $LogFile->setSeparator(' ');
 
                 $facilities[self::OUTPUT_FILE]['LogFile'] = $LogFile;
-            }
-            else {
+            } else {
                 $level = $facility;
             }
         }
@@ -123,13 +121,13 @@ class Log
 
 
         $level = self::$facilities[$configurationName][self::OUTPUT_MAIL]['level'] ?? 0;
-        if(isset($facilities[self::OUTPUT_MAIL])) {
+        if (isset($facilities[self::OUTPUT_MAIL])) {
             $facility = $facilities[self::OUTPUT_MAIL];
-            if(is_array($facility)) {
+            if (is_array($facility)) {
                 $level = $facility['level'] ?? 0;
                 $from = $facility['from'] ?? G7SYSTEM_DEFAULT_MAIL_ADDRESS;
                 $to = $facility['to'] ?? '';
-                $subject = $facility['subject'] ?? $_SERVER['SERVER_NAME'] . ' ' . Weblication::getInstance()->getName() . ' reports';
+                $subject = $facility['subject'] ?? $_SERVER['SERVER_NAME'].' '.Weblication::getInstance()->getName().' reports';
 
                 $Mailer = new SendmailMailer();
                 $MailMsg = new Message();
@@ -137,44 +135,41 @@ class Log
 
                 $facilities[self::OUTPUT_MAIL]['Mailer'] = $Mailer;
                 $facilities[self::OUTPUT_MAIL]['MailMsg'] = $MailMsg;
-            }
-            else {
+            } else {
                 $level = $facility;
             }
         }
         $facilities[self::OUTPUT_MAIL]['level'] = (int)$level;
 
         $level = self::$facilities[$configurationName][self::OUTPUT_DAO]['level'] ?? 0;
-        if(isset($facilities[self::OUTPUT_DAO])) {
+        if (isset($facilities[self::OUTPUT_DAO])) {
             $facility = $facilities[self::OUTPUT_DAO];
-            if(is_array($facility)) {
+            if (is_array($facility)) {
                 $level = $facility['level'] ?? 0;
                 $DAO = $facility['DAO'] ?? null;
                 $tableDefine = $facility['tableDefine'] ?? '';
                 $host = $facility['host'] ?? MYSQL_HOST;
                 $charset = $facility['charset'] ?? 'utf8';
 
-                if($tableDefine) {
+                if ($tableDefine) {
                     $databaseName = $tableDefine[0];
                     try {
                         DataInterface::getInterfaceForResource($databaseName);
-                    }
-                    catch(InvalidArgumentException) {
+                    } catch (InvalidArgumentException) {
                         DataInterface::createDataInterface([
                             'host' => $host,
                             'database' => $databaseName,
-                            'charset' => $charset
+                            'charset' => $charset,
                         ]);
                     }
                     /** @var DAO\MySQL_DAO $table */
                     $table = $tableDefine[1];
-                    if(is_object($table)) {
-                        if(!$table instanceof DAO\MySQL_DAO) {
-                            throw new \RuntimeException('Invalid DAO class');
+                    if (is_object($table)) {
+                        if (!$table instanceof DAO\MySQL_DAO) {
+                            throw new RuntimeException('Invalid DAO class');
                         }
                         $DAO = $table::create(databaseName: $databaseName);
-                    }
-                    else if(is_string($table)) {
+                    } elseif (is_string($table)) {
                         $DAO = DAO\MySQL_DAO::create($table, $databaseName);
                     }
 
@@ -182,30 +177,25 @@ class Log
                 }
 
                 $facilities[self::OUTPUT_DAO]['DAO'] = $DAO;
-            }
-            else {
+            } else {
                 $level = $facility;
             }
         }
         $facilities[self::OUTPUT_DAO]['level'] = (int)$level;
 
-        if(!isset($facilities[self::EXIT_LEVEL])) {
+        if (!isset($facilities[self::EXIT_LEVEL])) {
             $facilities[self::EXIT_LEVEL] = self::$facilities[$configurationName][self::EXIT_LEVEL] ?? self::LEVEL_NONE;
         }
 
         self::$facilities[$configurationName] = $facilities;
 
-        register_shutdown_function(static fn() =>
-            Log::close()
+        register_shutdown_function(static fn()
+            => Log::close(),
         );
     }
 
     /**
-     * returns the level of the corresponding output
-     *
-     * @param string $configurationName
-     * @param string $output
-     * @return int
+     * Returns the level of the corresponding output
      */
     private static function getLevel(string $configurationName, string $output): int
     {
@@ -213,10 +203,7 @@ class Log
     }
 
     /**
-     * returns the exit level
-     *
-     * @param string $configurationName
-     * @return int
+     * Returns the exit level
      */
     private static function getExitLevel(string $configurationName): int
     {
@@ -224,10 +211,7 @@ class Log
     }
 
     /**
-     * returns whether the output with timestamp is requested
-     *
-     * @param string $configurationName
-     * @return bool
+     * Returns whether the output with timestamp is requested
      */
     private static function screenWithDate(string $configurationName): bool
     {
@@ -235,22 +219,20 @@ class Log
     }
 
     /**
-     * returns whether the output with line breaks is requested
-     *
-     * @param string $configurationName
-     * @return bool
+     * Returns whether the output with line breaks is requested
      */
     private static function screenWithLineBreak(string $configurationName): bool
     {
         return self::$facilities[$configurationName][Log::OUTPUT_SCREEN]['withLineBreak'] ?? true;
     }
 
+    private static function screenWithExtra(string $configurationName): array|bool
+    {
+        return self::$facilities[$configurationName][Log::OUTPUT_SCREEN]['withExtra'] ?? false;
+    }
+
     /**
-     * returns whether the output with the name of the level is requested
-     *
-     * @param string $configurationName
-     * @param string $output
-     * @return bool
+     * Returns whether the output with the name of the level is requested
      */
     private static function showLevelNameAtTheBeginning(string $configurationName, string $output): bool
     {
@@ -258,12 +240,7 @@ class Log
     }
 
     /**
-     * writes debug message
-     *
-     * @param string $text
-     * @param array $extra
-     * @param string $configurationName
-     * @return void
+     * Writes debug message
      */
     public static function debug(string $text, array $extra = [], string $configurationName = Log::COMMON): void
     {
@@ -271,12 +248,7 @@ class Log
     }
 
     /**
-     * writes info message
-     *
-     * @param string $text
-     * @param array $extra
-     * @param string $configurationName
-     * @return void
+     * Writes info message
      */
     public static function info(string $text, array $extra = [], string $configurationName = Log::COMMON): void
     {
@@ -284,12 +256,7 @@ class Log
     }
 
     /**
-     * writes warning message
-     *
-     * @param string $text
-     * @param array $extra
-     * @param string $configurationName
-     * @return void
+     * Writes warning message
      */
     public static function warn(string $text, array $extra = [], string $configurationName = Log::COMMON): void
     {
@@ -297,12 +264,7 @@ class Log
     }
 
     /**
-     * writes an error message
-     *
-     * @param string $text
-     * @param array $extra
-     * @param string $configurationName
-     * @return void
+     * Writes an error message
      */
     public static function error(string $text, array $extra = [], string $configurationName = Log::COMMON): void
     {
@@ -310,12 +272,7 @@ class Log
     }
 
     /**
-     * writes a fatal error message
-     *
-     * @param string $text
-     * @param array $extra
-     * @param string $configurationName
-     * @return void
+     * Writes a fatal error message
      */
     public static function fatal(string $text, array $extra = [], string $configurationName = Log::COMMON): void
     {
@@ -327,23 +284,23 @@ class Log
      */
     public static function message(string $text, int $level = self::LEVEL_INFO, array $extra = [], string $configurationName = Log::COMMON): void
     {
-        if(self::getLevel($configurationName, self::OUTPUT_SCREEN) & $level) {
+        if (self::getLevel($configurationName, self::OUTPUT_SCREEN) & $level) {
             self::writeScreen($text, $level, $extra, $configurationName);
         }
 
-        if(self::getLevel($configurationName, self::OUTPUT_FILE) & $level) {
+        if (self::getLevel($configurationName, self::OUTPUT_FILE) & $level) {
             self::writeFile($text, $level, $extra, $configurationName);
         }
 
-        if(self::getLevel($configurationName, self::OUTPUT_MAIL) & $level) {
+        if (self::getLevel($configurationName, self::OUTPUT_MAIL) & $level) {
             self::writeMail($text, $level, $extra, $configurationName);
         }
 
-        if(self::getLevel($configurationName, self::OUTPUT_DAO) & $level) {
+        if (self::getLevel($configurationName, self::OUTPUT_DAO) & $level) {
             self::writeDAO($text, $level, $extra, $configurationName);
         }
 
-        if($level === self::getExitLevel($configurationName)) {
+        if ($level === self::getExitLevel($configurationName)) {
             exit(1);
         }
     }
@@ -357,47 +314,47 @@ class Log
 
         $withDate = self::screenWithDate($configurationName);
         $withLineBreak = self::screenWithLineBreak($configurationName);
+        $withExtra = self::screenWithExtra($configurationName);
 
-        if(\pool\IS_CLI) {
-            if($isHTML) {
+        if (\pool\IS_CLI) {
+            if ($isHTML) {
                 // no html
                 $message = str_replace(['&nbsp;', '<br>', '<hr>'], [' ', \pool\LINE_BREAK, str_repeat('-', 25)], $message);
                 $message = strip_tags($message);
             }
 
             $isEmptyString = isEmptyString($message);
-            if(!$isEmptyString) {
-                if(self::showLevelNameAtTheBeginning($configurationName, Log::OUTPUT_SCREEN)) {
-                    $message = ucfirst(self::$TEXT_LEVEL[$level]) . ': ' . $message;
+            if (!$isEmptyString) {
+                if (self::showLevelNameAtTheBeginning($configurationName, Log::OUTPUT_SCREEN)) {
+                    $message = ucfirst(self::$TEXT_LEVEL[$level]).': '.$message;
                 }
             }
 
-            $message = ($withDate ? date('Y-m-d H:i:s') . ' | ' : '') . $message;
+            if ($withExtra && $extra) {
+                $placeholders = [];
+                array_walk($extra, static function ($value, $key) use (&$placeholders) {
+                    $placeholders["{{$key}}"] = $value;
+                });
+                $message = strtr($message, $placeholders);
+            }
+            $message = ($withDate ? date('Y-m-d H:i:s').' | ' : '').$message;
             $message .= $withLineBreak ? \pool\LINE_BREAK : '';
 
-            if(self::LEVEL_ERROR & $level or self::LEVEL_FATAL & $level) {
-                $stderr = fopen('php://stderr', 'w');
-                fwrite($stderr, $message);
-                fclose($stderr);
-            }
-            else {
-                $stdout = fopen('php://stdout', 'w');
-                fwrite($stdout, $message);
-                fclose($stdout);
-            }
-        }
-        else {
-            if($isHTML) {
+            $filename = (self::LEVEL_ERROR & $level or self::LEVEL_FATAL & $level) ? 'php://stderr' : 'php://stdout';
+            $std = fopen($filename, 'w');
+            fwrite($std, $message);
+            fclose($std);
+        } else {
+            if ($isHTML) {
                 $foundHeadline = preg_match_all('/<\/(h[1-6]+|p)>$/m', $message);
-                if(!$foundHeadline) {
+                if (!$foundHeadline) {
                     $message .= ($withLineBreak ? \pool\LINE_BREAK : '');
                 }
                 // todo insert displayLevelScreen? or not
-            }
-            else {
+            } else {
                 $message .= ($withLineBreak ? \pool\LINE_BREAK : '');
             }
-            $message = ($withDate ? date('Y-m-d H:i:s') . ' | ' : '') . $message;
+            $message = ($withDate ? date('Y-m-d H:i:s').' | ' : '').$message;
 
             echo $message;
         }
@@ -406,7 +363,7 @@ class Log
     public static function writeFile(string $text, int $level, array $extra = [], string $configurationName = Log::COMMON): void
     {
         $message = ucfirst(self::$TEXT_LEVEL[$level]).' '.$text;
-        if(!empty($extra)) {
+        if (!empty($extra)) {
             $message .= ' '.json_encode($extra);
         }
         self::$facilities[$configurationName][self::OUTPUT_FILE]['LogFile']->addLine($message);
@@ -424,31 +381,31 @@ class Log
     {
         $message = $text;
         $DAO = self::$facilities[$configurationName][self::OUTPUT_DAO]['DAO'];
-        if(self::$dao_strip_tags && isHTML($message)) {
+        if (self::$dao_strip_tags && isHTML($message)) {
             // no html
             $message = trim(str_replace(['&nbsp;', '<br>', '<hr>'], [' ', chr(10), ''], $message));
             $message = strip_tags($message);
         }
         $Data = new Input();
-        $Data->setData([
+        $Data->setData(
+            [
                 'message' => substr($message, 0, 2048),
-                'level' => self::$TEXT_LEVEL[$level]
-            ] + $extra);
+                'level' => self::$TEXT_LEVEL[$level],
+            ] + $extra,
+        );
         $Data = $Data->filter($DAO->getColumns());
         $DAO->insert($Data->getData());
     }
 
     /**
      * close resource / file handles
-     *
-     * @return void
      */
     public static function close(): void
     {
-        foreach(self::$facilities as $facility) {
-            if(isset($facility[self::OUTPUT_FILE]['LogFile']))
+        foreach (self::$facilities as $facility) {
+            if (isset($facility[self::OUTPUT_FILE]['LogFile']))
                 $facility[self::OUTPUT_FILE]['LogFile']->close();
-            if(isset($facility[self::OUTPUT_DAO]['DAO']))
+            if (isset($facility[self::OUTPUT_DAO]['DAO']))
                 $facility[self::OUTPUT_DAO]['DAO']->getDataInterface()->close();
         }
     }
@@ -465,9 +422,11 @@ class Log
     {
         $directory ??= buildDirPath(sys_get_temp_dir(), 'error-details');
         do {
-            $file = buildFilePath($directory,
-                base64_encode(random_bytes(8)));
-        } while(file_exists($file));
+            $file = buildFilePath(
+                $directory,
+                base64_encode(random_bytes(8)),
+            );
+        } while (file_exists($file));
         file_put_contents($file, $details);
         return realpath($file);
     }

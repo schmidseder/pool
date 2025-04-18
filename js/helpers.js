@@ -555,14 +555,14 @@ function downloadFile(file) {
     // alle modernen Browser (IE ab 9er)
     try {
         // funktioniert leider nicht im Safari unter Windows
-        let ClickEvent = new MouseEvent('click', {
+        const clickEvent = new MouseEvent('click', {
             view: window,
             bubbles: true,
             cancelable: false
         });
 
         link.target = '_blank';
-        link.dispatchEvent(ClickEvent);
+        link.dispatchEvent(clickEvent);
     }
     catch(e) {
         if (link.click) {
@@ -1154,27 +1154,27 @@ function triggerEvent(element, type) {
 /**
  * Load json file synchronously
  *
- * @param string url
- * @param object opts e.g. headers
  * @returns {null|any}
+ * @param {string} url - URL of the JSON file
+ * @param {object} opts - Additional options for the request (e.g. headers)
+ * @param {boolean} synchronously - Whether to load the file synchronously or asynchronously
+ * @throws {Error} if the request fails
  */
-function loadJSON(url, opts = {}) {
-    let xhr = new XMLHttpRequest();
+function loadJSON(url, opts = {}, synchronously = true) {
+    const xhr = new XMLHttpRequest();
     xhr.overrideMimeType('application/json');
-    xhr.open('GET', url, false);
-
-    if (opts.headers) {
-        for (let key in opts.headers) {
+    xhr.open('GET', url, !synchronously);
+    if(opts.headers) {
+        for(let key in opts.headers) {
             xhr.setRequestHeader(key, opts.headers[key]);
         }
     }
-
     xhr.send();
-    if (xhr.status == 200) {
+
+    if(xhr.status === 200) {
         return JSON.parse(xhr.responseText);
-    } else {
-        return null;
     }
+    throw new Error(`Error loading JSON file: ${url} HTTP Status: ${xhr.status} (${xhr.statusText})`);
 }
 
 /**

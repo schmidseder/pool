@@ -4,16 +4,31 @@
  *
  * (c) Alexander Manhart <alexander@manhart-it.de>
  *
+ * For a list of contributors, please see the CONTRIBUTORS.md file
+ * @see https://github.com/manhart/pool/blob/master/CONTRIBUTORS.md
+ *
  * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * file that was distributed with this source code, or visit the following link:
+ * @see https://github.com/manhart/pool/blob/master/LICENSE
+ *
+ * For more information about this project:
+ * @see https://github.com/manhart/pool
  */
+
+namespace pool\guis\GUI_HeadData;
 
 use pool\classes\Core\Component;
 use pool\classes\Core\Module;
 use pool\classes\Core\Url;
+use pool\classes\Core\Weblication;
+use pool\classes\Exception\FileNotFoundException;
+use pool\classes\Exception\InvalidArgumentException;
+use pool\classes\GUI\GUI_Module;
+use const pool\NAMESPACE_SEPARATOR;
 
 /**
  * Class GUI_HeaderData
+ *
  * @package pool\guis\GUI_HeaderData
  * @since 2003-07-10
  */
@@ -23,7 +38,6 @@ class GUI_HeadData extends GUI_Module
     public const ROBOTS_INDEX = 'index';        # Inhalte aus der aktuellen HTML-Datei an seine Suchdatenbank zu uebermitteln (index = Indizierung).
     public const ROBOTS_NOFOLLOW = 'nofollow';    # Damit erlauben Sie einem Suchprogramm, Inhalte aus der aktuellen HTML-Datei an seine Suchdatenbank zu uebermitteln (nofollow = nicht folgen). Sie verbieten dem Suchprogramm jedoch, untergeordnete Dateien Ihres Projekts, zu denen Verweise fuehren, zu besuchen.
     public const ROBOTS_FOLLOW = 'follow';        # Damit erlauben Sie einem Suchprogramm ausdruecklich, Inhalte aus der aktuellen HTML-Datei und aus untergeordneten Dateien Ihres Projekts, zu denen Verweise fuehren, zu besuchen und an seine Suchdatenbank zu uebermitteln (follow = folgen).
-
     // @var integer Datei von Originaladresse laden; z.B. 12 Stunden = 43200; (vertraegt auch String siehe Selfhtml)
     // @access private
     var $Expires = 0;
@@ -41,6 +55,7 @@ class GUI_HeadData extends GUI_Module
 
     /**
      * meta refresh
+     *
      * @var array
      */
     private array $metaRefresh = [];
@@ -79,12 +94,14 @@ class GUI_HeadData extends GUI_Module
 
     /**
      * base target: _blank, _self (browser default), _parent, _top
+     *
      * @var string
      */
     private string $baseTarget = '_self';
 
     /**
      * base href
+     *
      * @var string
      */
     private string $baseHref;
@@ -132,10 +149,11 @@ class GUI_HeadData extends GUI_Module
     /**
      * loads the template (Html Kopfdaten)
      */
-    public function loadFiles()
+    public function loadFiles(): static
     {
-        $file = $this->Weblication->findTemplate('tpl_headData.html', __CLASS__, true);
+        $file = $this->Weblication->findTemplate('tpl_headData.html', 'GUI_HeadData', true);
         $this->Template->setFilePath('head', $file);
+        return $this;
     }
 
     /**
@@ -194,7 +212,6 @@ class GUI_HeadData extends GUI_Module
 
     /**
      * @param string $description
-     *
      * @return void
      */
     public function setDescription(string $description): void
@@ -246,6 +263,27 @@ class GUI_HeadData extends GUI_Module
         $this->metaRefresh['url'] = $url;
     }
 
+    public function addClientWebAsset(string $extension, string $file, ?string $classFolder = null, bool $baseLib = false, bool $isOptional = false): ?static {
+        $weblication = Weblication::getInstance();
+        $classFolder ??= $file;
+        [$file] = array_reverse(explode(NAMESPACE_SEPARATOR, $file));
+        [$classFolder] = array_reverse(explode(NAMESPACE_SEPARATOR, $classFolder));
+        /* @noinspection PhpDeprecationInspection */
+        $filePath = match ($extension) {
+            'css' => $weblication->findStyleSheet("$file.$extension", $classFolder, $baseLib, false),
+            'js' => $weblication->findJavaScript("$file.$extension", $classFolder, $baseLib, false),
+            default => throw new InvalidArgumentException("Unhandled web-asset extension '$extension'"),
+        };
+        if (!$filePath && !$isOptional) throw new FileNotFoundException("Could not find the web-asset $file.$extension");
+        elseif (!$filePath) return $this;
+        match ($extension) {
+            'css' => $this->addStyleSheet($filePath),
+            'js' => $this->addJavaScript($filePath),
+            default => throw new InvalidArgumentException("Unhandled web-asset extension '$extension'"),
+        };
+        return $this;
+    }
+
     /**
      * Add stylesheet file to the page
      *
@@ -255,9 +293,9 @@ class GUI_HeadData extends GUI_Module
      */
     public function addStyleSheet(string $file, $media = null): self
     {
-        if($file == '') return $this;
-        if($this->addFileFct) $file = call_user_func($this->addFileFct, $file);
-        if(in_array($file, $this->styleSheetFiles)) return $this;
+        if ($file == '') return $this;
+        if ($this->addFileFct) $file = call_user_func($this->addFileFct, $file);
+        if (in_array($file, $this->styleSheetFiles)) return $this;
         $this->styleSheetFiles[] = $file;
         $this->styleSheetsMedia[count($this->styleSheetFiles) - 1] = $media;
         return $this;
@@ -272,26 +310,26 @@ class GUI_HeadData extends GUI_Module
      */
     public function addJavaScript(string $file, array $attributes = []): self
     {
-        if($file === '') {
+        if ($file === '') {
             return $this;
         }
-        if(isset($this->javaScriptFiles[$file])) {
+        if (isset($this->javaScriptFiles[$file])) {
             return $this;
         }
 
         $originalFile = $file;
         // $fileName = basename(strtok($file, '?'));
 
-        if($this->addFileFct) {
+        if ($this->addFileFct) {
             $file = call_user_func($this->addFileFct, $file);
         }
 
         $js = [
             'file' => $file,
-            'originalFile' => $originalFile
+            'originalFile' => $originalFile,
         ];
 
-        if($attributes) {
+        if ($attributes) {
             $js['attributes'] = $attributes;
         }
         $this->javaScriptFiles[$originalFile] = $js;
@@ -340,8 +378,12 @@ class GUI_HeadData extends GUI_Module
     public function setClientData(Module $Module, ?array $initOptions = null, string $jsClassName = null): self
     {
         $clientData =& $this->clientData[$Module->getName()];
-        $clientData ??= ['className' => $jsClassName ?? $Module->getClassName(), 'fullyQualifiedClassName' => $Module::class, 'parentModuleName' => $Module->getParent()?->getName()];
-        if(!$initOptions) return $this;
+        $clientData ??= [
+            'className' => $jsClassName ?? $Module->getClassName(),
+            'fullyQualifiedClassName' => $Module::class,
+            'parentModuleName' => $Module->getParent()?->getName(),
+        ];
+        if (!$initOptions) return $this;
         $existingInitOptions =& $clientData['initOptions'];
         $existingInitOptions ??= [];
         $existingInitOptions += $initOptions;
@@ -358,82 +400,84 @@ class GUI_HeadData extends GUI_Module
         $Url = new Url(false);
 
         $this->Template->setVars([
-                'EXPIRES' => $this->Expires,
-                'LANGUAGE' => $this->Weblication->getLanguage(),
-                'TITLE' => $this->title,
-                'DESCRIPTION' => $this->description,
-                'ROBOTS' => $this->robots,
-                'BASE_HREF' => $this->baseHref,
-                'BASE_TARGET' => $this->baseTarget,
-                'CHARSET' => $this->charset,
-                'KEYWORDS' => '',
-                'AUTHOR' => '',
-                'CLIENT-DATA' => \base64_encode(\json_encode($this->clientData,
-                    JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION)),
-                'SCRIPT' => $Url->getUrl()
-            ]
+            'EXPIRES' => $this->Expires,
+            'LANGUAGE' => $this->Weblication->getLanguage(),
+            'TITLE' => $this->title,
+            'DESCRIPTION' => $this->description,
+            'ROBOTS' => $this->robots,
+            'BASE_HREF' => $this->baseHref,
+            'BASE_TARGET' => $this->baseTarget,
+            'CHARSET' => $this->charset,
+            'KEYWORDS' => '',
+            'AUTHOR' => '',
+            'CLIENT-DATA' => base64_encode(
+                json_encode(
+                    $this->clientData,
+                    JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION,
+                ),
+            ),
+            'SCRIPT' => $Url->getUrl(),
+        ],
         );
 
-        if($this->xuaCompatible !== '') {
-            if($this->Template->newBlock('XUACOMPATIBLE')) {
+        if ($this->xuaCompatible !== '') {
+            if ($this->Template->newBlock('XUACOMPATIBLE')) {
                 $this->Template->setVar('XUACOMPATIBLE_VALUE', $this->xuaCompatible);
             }
             $this->Template->leaveBlock();
         }
 
-        if($this->BrowserNoCache) {
+        if ($this->BrowserNoCache) {
             $this->Template->newBlock('BROWSERNOCACHE');
         }
 
-        if($this->proxyNoCache) {
+        if ($this->proxyNoCache) {
             $this->Template->newBlock('PROXYNOCACHE');
         }
 
-        if($this->metaRefresh) {
+        if ($this->metaRefresh) {
             $this->Template->newBlock('METAREFRESH');
             $this->setVar('REFRESH', $this->metaRefresh['seconds']);
             $this->setVar('URL', $this->metaRefresh['url']);
         }
 
         $z = 0;
-        foreach($this->styleSheetFiles as $css) {
+        foreach ($this->styleSheetFiles as $css) {
             $this->Template->newBlock('STYLESHEET');
             $this->Template->setVar('FILENAME', $css);
-            if(!is_null($this->styleSheetsMedia[$z])) { // Media
-                $this->Template->setVar('MEDIA', ' media="' . $this->styleSheetsMedia[$z] . '"');
-            }
-            else {
+            if (!is_null($this->styleSheetsMedia[$z])) { // Media
+                $this->Template->setVar('MEDIA', ' media="'.$this->styleSheetsMedia[$z].'"');
+            } else {
                 $this->Template->setVar('MEDIA');
             }
             $z++;
         }
 
-        foreach($this->javaScriptFiles as $js) {
+        foreach ($this->javaScriptFiles as $js) {
             $this->Template->newBlock('JAVASCRIPT');
             $this->Template->setVar('FILENAME', $js['file']);
             $attributes = '';
-            if(isset($js['attributes'])) {
-                $attributes = htmlAttributes($js['attributes']);
+            if (isset($js['attributes'])) {
+                $attributes = buildHtmlAttributes($js['attributes']);
             }
             $this->Template->setVar('attributes', $attributes);
         }
 
-        if(count($this->scriptCode) > 0) {
+        if (count($this->scriptCode) > 0) {
             $this->Template->newBlock('INLINE_SCRIPT_CODE');
-            foreach($this->scriptCode as $name => $code) {
+            foreach ($this->scriptCode as $name => $code) {
                 $ScriptBlock = $this->Template->newBlock('SCRIPT_CODE');
-                if($ScriptBlock) {
+                if ($ScriptBlock) {
                     $ScriptBlock->setVar('NAME', $name);
                     $ScriptBlock->setVar('CODE', $code);
-                }
-                else if($this->Weblication->isXdebugEnabled()) {
+                } elseif ($this->Weblication->isXdebugEnabled()) {
                     /** @noinspection ForgottenDebugOutputInspection */
                     xdebug_print_function_stack('SCRIPT_CODE is missing in tpl_head.html');
                 }
             }
         }
 
-        if(file_exists('favicon.ico')) {
+        if (file_exists('favicon.ico')) {
             $this->Template->newBlock('favicon');
         }
 

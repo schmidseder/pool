@@ -1,35 +1,32 @@
 <?php
+
 /**
  * Convert a fraction string to a decimal.
  *
- * @param string $str
- * @return int|float
+ * @param string $fraction
+ * @return float
  * @since 2.5.0
  */
-function exif_frac2dec($str)
+function exif_frac2dec(string $fraction): float
 {
-    @list($n, $d) = explode('/', $str);
-    if (!empty($d)) {
-        return $n / $d;
-    }
-
-    return $str;
+    [$numerator, $denominator] = explode('/', $fraction) + [1, 1];
+    return $denominator ? $numerator / $denominator : (float)$fraction;
 }
 
 
 /**
  * Convert the exif date format to a unix timestamp.
  *
- * @param string $str
+ * @param string $dateString
  * @return int
  * @since 2.5.0
  */
-function exif_date2ts($str)
+function exif_date2ts(string $dateString): int
 {
-    @list($date, $time) = explode(' ', trim($str));
-    @list($y, $m, $d) = explode(':', $date);
+    [$date, $time] = explode(' ', trim($dateString)) + ['', ''];
+    [$y, $m, $d] = explode(':', $date) + [0, 0, 0];
 
-    return strtotime("{$y}-{$m}-{$d} {$time}");
+    return strtotime("$y-$m-$d $time") ?: 0;
 }
 
 /**
@@ -45,11 +42,15 @@ function exif_date2ts($str)
  * @todo Try other exif libraries if available.
  * @since 2.5.0
  */
-function readImageMetadata($file)
+function readImageMetadata(string $file): array|false
 {
-    list(, , $image_type) = @getimagesize($file);
+    if (!file_exists($file)) {
+        return false;
+    }
 
-    $meta = array(
+    [, , $image_type] = @getimagesize($file);
+
+    $meta = [
         'aperture' => 0,
         'credit' => '',
         'camera' => '',
@@ -61,10 +62,10 @@ function readImageMetadata($file)
         'shutter_speed' => 0,
         'title' => '',
         'orientation' => 0,
-        'keywords' => array(),
-    );
+        'keywords' => [],
+    ];
 
-    $iptc = array();
+    $iptc = [];
 
     /*
     * Read IPTC first, since it might contain data not available in exif such
@@ -81,8 +82,7 @@ function readImageMetadata($file)
                 * Title, "Many use the Title field to store the filename of the image,
                 * though the field may be used in many ways."
                 */
-            }
-            elseif (!empty($iptc['2#005'][0])) {
+            } elseif (!empty($iptc['2#005'][0])) {
                 $meta['title'] = trim($iptc['2#005'][0]);
             }
 
@@ -100,8 +100,7 @@ function readImageMetadata($file)
 
             if (!empty($iptc['2#110'][0])) { // credit
                 $meta['credit'] = trim($iptc['2#110'][0]);
-            }
-            elseif (!empty($iptc['2#080'][0])) { // creator / legacy byline
+            } elseif (!empty($iptc['2#080'][0])) { // creator / legacy byline
                 $meta['credit'] = trim($iptc['2#080'][0]);
             }
 
@@ -119,9 +118,9 @@ function readImageMetadata($file)
         }
     }
 
-    $exif = array();
+    $exif = [];
 
-    $exif_image_types = array(IMAGETYPE_JPEG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM);
+    $exif_image_types = [IMAGETYPE_JPEG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM];
     if (is_callable('exif_read_data') && in_array($image_type, $exif_image_types)) {
         $exif = @exif_read_data($file);
 
@@ -139,16 +138,14 @@ function readImageMetadata($file)
             if (empty($meta['caption'])) {
                 $meta['caption'] = trim($exif['ImageDescription']);
             }
-        }
-        elseif (empty($meta['caption']) && !empty($exif['Comments'])) {
+        } elseif (empty($meta['caption']) && !empty($exif['Comments'])) {
             $meta['caption'] = trim($exif['Comments']);
         }
 
         if (empty($meta['credit'])) {
             if (!empty($exif['Artist'])) {
                 $meta['credit'] = trim($exif['Artist']);
-            }
-            elseif (!empty($exif['Author'])) {
+            } elseif (!empty($exif['Author'])) {
                 $meta['credit'] = trim($exif['Author']);
             }
         }
@@ -187,8 +184,8 @@ function readImageMetadata($file)
         }
     }
 
-    if(!empty($iptc) or !empty($exif)) {
-        foreach (array('title', 'caption', 'credit', 'copyright', 'camera', 'iso') as $key) {
+    if (!empty($iptc) or !empty($exif)) {
+        foreach (['title', 'caption', 'credit', 'copyright', 'camera', 'iso'] as $key) {
             if ($meta[$key] && !seems_utf8($meta[$key])) {
                 $meta[$key] = UConverter::transcode($meta[$key], 'UTF8', 'ISO-8859-1');
             }
@@ -293,7 +290,6 @@ function resizeImageToBestFit($im, int $max_width, int $max_height)
 
 /**
  * changes the dimensions of the image
- *
  * https://christianwood.net/posts/png-files-are-complicate/
  *
  * @param resource $im
@@ -327,7 +323,7 @@ function resizeImage($im, int $width, int $height)
         $dest_w,
         $dest_h,
         $source_w,
-        $source_h
+        $source_h,
     );
 
     return $dest_im;
